@@ -1,0 +1,251 @@
+								C++ ASSIGNMENT
+							       ________________
+
+
+DOCUMENTATION
+______________
+
+Author Name - Shreesh Narayan Singh
+Regn No- 201700404
+Date - 10/10/20
+Attempted Section --> C++ Assignment Only
+
+COMPILATION INSTRUCTION
+_________________________
+
+For Compilation - $ sudo g++ <your-program-file-name>.cpp
+
+For running/executing- $ ./a.out
+
+
+ASSUMPTIONS:
+_____________
+*All the words in the dictionary are in lowercase.
+
+
+
+Question 1
+___________
+
+
+#include <bits/stdc++.h> 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std; 
+
+const int ALPHABET_SIZE = 26; 
+char path[30];
+int ii=0;
+
+struct TrieNode 
+{ 
+    struct TrieNode *children[ALPHABET_SIZE]; // All Nodes can have 26 children ( a to z only)
+    bool isEndOfWord; // isEndOfWord is true if the node represents end of a word 
+    int end_value; // It is the value which is associated with every word in dictionary and it unique too.
+    char val;   // It is the value which every node holds
+    struct TrieNode *parent;  // It points to the parent of every child node
+}; 
+
+struct TrieNode *getNode(char v) // This function is to generate every children nodes of a given node
+{ 
+    struct TrieNode *pNode =  new TrieNode; 
+   
+    for (int i = 0; i < ALPHABET_SIZE; i++) 
+    {
+        pNode->children[i] = NULL; 
+    }
+    pNode->isEndOfWord = false; 
+    pNode->val=v;
+    return pNode; 
+} 
+  
+struct TrieNode* insert(struct TrieNode *root, string key,int end_val) // This function is being used to insert words into dictionary
+{ 
+    struct TrieNode *pCrawl = root; 
+    for (int i = 0; i < key.length(); i++) 
+    { 
+        int index =(int) key[i] - 'a'; 
+        if (pCrawl->children[index]==NULL) {
+            pCrawl->children[index] = getNode(key[i]);
+            (pCrawl->children[index])->parent=pCrawl;
+        }
+        pCrawl = pCrawl->children[index]; 
+    }
+    pCrawl->isEndOfWord = true; 
+    pCrawl->end_value=end_val;
+    return root;
+} 
+
+bool search(struct TrieNode *root, string key) // To search a particular word in dictionary
+{ 
+    struct TrieNode *pCrawl = root; 
+    for (int i = 0; i < key.length(); i++) 
+    { 
+        int index = key[i] - 'a'; 
+        if (!pCrawl->children[index]) 
+            return false; 
+        pCrawl = pCrawl->children[index]; 
+    } 
+    if(pCrawl != NULL && pCrawl->isEndOfWord)
+    {
+        cout<<"YES,"<<pCrawl->end_value<<"\n";
+        return true;
+    }
+    else
+        return false;
+} 
+
+int main() 
+{ 
+    struct TrieNode *root = getNode('\0'); 
+    ifstream ip("EnglishDictionary.csv");
+    if(!ip.is_open()) std::cout << "ERROR: File Open" << '\n'; // To read data from CSV file
+    string word;
+    string number;
+    while(ip.good())
+    {
+
+        getline(ip,word,',');
+        getline(ip,number);
+        stringstream geek(number);// converting string into number
+        int x = 0;
+        geek >> x;// taking end value same as which is given in csv file (it is not unique in this case)
+        root=insert(root,word,x); 
+            
+    }
+
+    ip.close();
+    String xy;
+    cout<<"Enter the string which you want to search: ";
+    cin>>xy;
+    if((search(root, xy))== false)
+         cout<<"No\n";
+   
+}
+
+--------------------------------------------------------------------------------------------------------------------------------
+________________________________________________________________________________________________________________________________
+
+
+
+
+
+Question 2
+___________
+
+#include <bits/stdc++.h> 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std; 
+
+const int ALPHABET_SIZE = 26; 
+char path[30];
+int ii=0;
+
+struct TrieNode 
+{ 
+    struct TrieNode *children[ALPHABET_SIZE]; 
+    bool isEndOfWord;
+    int end_value;
+    char val;
+    struct TrieNode *parent;
+}; 
+
+struct TrieNode *getNode(char v) 
+{ 
+    struct TrieNode *pNode =  new TrieNode; 
+   
+    for (int i = 0; i < ALPHABET_SIZE; i++) 
+    {
+        pNode->children[i] = NULL; 
+    }
+    pNode->isEndOfWord = false; 
+    pNode->val=v;
+    return pNode; 
+} 
+  
+struct TrieNode* insert(struct TrieNode *root, string key,int end_val) 
+{ 
+    struct TrieNode *pCrawl = root; 
+    for (int i = 0; i < key.length(); i++) 
+    { 
+        int index =(int) key[i] - 'a'; 
+        if (pCrawl->children[index]==NULL) {
+            pCrawl->children[index] = getNode(key[i]);
+            (pCrawl->children[index])->parent=pCrawl;
+        }
+        pCrawl = pCrawl->children[index]; 
+    }
+    pCrawl->isEndOfWord = true; 
+    pCrawl->end_value=end_val;
+    return root;
+} 
+
+
+void charPath(struct TrieNode* node)
+{
+    while(node->parent!=NULL)
+    {
+        path[ii++]=node->val;
+        node=node->parent;
+    }
+}
+void traversal(struct TrieNode* node,int n) // To traverse through whole trie and find the reuired word using index value
+{
+   
+    if (node == NULL)
+        return;
+     if(n==node->end_value)
+        {
+            charPath(node);
+            return;
+        }
+    
+    for(int i=0;i<ALPHABET_SIZE;i++)
+    {
+        traversal(node->children[i],n);
+    }
+}
+
+int main() 
+{ 
+
+    int count=0;
+    struct TrieNode *root = getNode('\0'); 
+
+    ifstream ip("EnglishDictionary.csv");
+
+    if(!ip.is_open()) std::cout << "ERROR: File Open" << '\n';
+
+    string word;
+    string number;
+
+
+    while(ip.good())
+    {
+
+        getline(ip,word,',');
+        getline(ip,number);
+        stringstream geek(number);
+        int x = 0;
+        geek >> x;
+        count++; // Taking random number for end values ,so that it can be unique as per mentioned in question statement.
+        root=insert(root,word,count); 
+            
+    }
+
+    ip.close();
+    int num;
+    cout<<"Enter an index number to search the string: ";
+    cin>>>num;
+    traversal(root,num);
+
+    for(int i=ii;i>=0;i--)
+    {
+             cout<<path[i];
+    }
+       
+    return 0; 
+}
